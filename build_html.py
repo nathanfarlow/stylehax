@@ -4,7 +4,7 @@ import sys
 def make_payload_string(payload):
     assert len(payload) % 2 == 0
     pairs = zip(payload[::2], payload[1::2])
-    return '\\u' + '\\u'.join(hex(b)[2:] + hex(a)[2:] for a, b in pairs)
+    return '\\u' + '\\u'.join(f'{b:02x}{a:02x}' for a, b in pairs)
 
 
 if __name__ == '__main__':

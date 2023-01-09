@@ -1,4 +1,0 @@
-.text
-
-payload:
-    b payload
