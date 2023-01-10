@@ -5,7 +5,7 @@ index.html: build_html.py template.html payload.bin
 	@rm payload.bin
 
 payload.bin: *.c
-	$(CC) -nostartfiles -nostdlib -DARM9 -I$(LIBNDS)/include *.c -o payload.elf -Os -fpie -Wall
+	$(CC) -nostartfiles -nostdlib -DARM9 -I$(LIBNDS)/include *.c -o payload.elf -fpie -Wall
 	$(OBJCOPY) -O binary payload.elf payload.bin
 	@rm payload.elf
 

