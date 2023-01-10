@@ -1,5 +1,5 @@
 # stylehax
-A Nintendo DSi browser exploit. Put boot.nds on your SD card. Load index.html.
+A Nintendo DSi browser exploit. Put boot.nds on your SD card. Then, open the DSi browser and go to http://stylehax.net
 
 ## Thanks
 * [melonds](https://github.com/melonDS-emu/melonDS) developers for writing such an accurate DSi emulator, including wifi capability
